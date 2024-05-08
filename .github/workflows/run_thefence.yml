@@ -1,15 +1,15 @@
-name: Run bots/bot_nostalgia.py every 2-59/10 minutes
+name: Run bots/bot_thefence.py every 8-59/10 minutes
 
 on:
   schedule:
-    - cron: '2-59/10 * * * *' # Run every 10 minutes from the second minute
+    - cron: '8-59/10 * * * *' # Run every 10 minutes
   push:
     branches:
       - main
 
 jobs:
   run-main-py:
-    name: Run bots/bot_nostalgia.py
+    name: Run bots/bot_thefence.py
     runs-on: ubuntu-latest
 
     env:
@@ -55,8 +55,8 @@ jobs:
           --token ${{ secrets.GH_PAT }} \
           --save_dir "./"
 
-    - name: Run bots/bot_nostalgia.py
-      run: python bots/bot_nostalgia.py # Replace 'main.py' with the actual filename if different
+    - name: Run bots/bot_thefence.py
+      run: python bots/bot_thefence.py # Replace 'main.py' with the actual filename if different
       env:
         LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
         LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}

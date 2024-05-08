@@ -1,4 +1,4 @@
-name: Run bots/bot_til.py every 10 minutes
+name: Run bots/bot_til.py every 4-59/10 minutes
 
 on:
   schedule:

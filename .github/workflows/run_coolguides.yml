@@ -1,4 +1,4 @@
-name: Run bots/bot_coolguides.py every 10 minutes
+name: Run bots/bot_coolguides.py every */10 minutes
 
 on:
   schedule:

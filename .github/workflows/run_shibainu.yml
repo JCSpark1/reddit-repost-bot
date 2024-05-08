@@ -1,4 +1,4 @@
-name: Run bots/bot_shibainu.py every 10 minutes
+name: Run bots/bot_shibainu.py every 6-59/10 minutes
 
 on:
   schedule:
