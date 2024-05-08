@@ -1,4 +1,4 @@
-name: Run bot_coolguides.py every 10 minutes
+name: Run origin/bot_coolguides.py every 10 minutes
 
 on:
   schedule:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   run-main-py:
-    name: Run bot_coolguides.py
+    name: Run origin/bot_coolguides.py
     runs-on: ubuntu-latest
 
     env:
@@ -55,8 +55,8 @@ jobs:
           --token ${{ secrets.GH_PAT }} \
           --save_dir "./"
 
-    - name: Run bot_coolguides.py
-      run: python bot_coolguides.py # Replace 'main.py' with the actual filename if different
+    - name: Run origin/bot_coolguides.py
+      run: python origin/bot_coolguides.py # Replace 'main.py' with the actual filename if different
       env:
         LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
         LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
