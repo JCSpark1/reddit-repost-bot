@@ -2,7 +2,7 @@ name: Run bot_coolguides.py every 10 minutes
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Run every 19 minutes
+    - cron: '*/10 * * * *' # Run every 19 minutes
   push:
     branches:
       - main
