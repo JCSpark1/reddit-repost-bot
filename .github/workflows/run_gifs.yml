@@ -1,0 +1,76 @@
+name: Run bots/bot_gifs.py every 12-59/10 minutes
+
+on:
+  schedule:
+    - cron: '12-59/10 * * * *' # Run every 10 minutes
+  push:
+    branches:
+      - main
+
+jobs:
+  run-main-py:
+    name: Run bots/bot_gifs.py
+    runs-on: ubuntu-latest
+
+    env:
+      LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
+      LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' # Replace 'x' with the appropriate version of Python for your script
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt # If your script has dependencies, list them in requirements.txt
+
+    - name: Run gh_download_artifact.py to download 'last_date_published.txt'
+      run: |
+        python gh_download_artifact.py \
+          --owner ${{ github.repository_owner }} \
+          --repo ${{ github.event.repository.name }} \
+          --artifact_name lemmy_last_date_published \
+          --token ${{ secrets.GH_PAT }} \
+          --save_dir "./"
+    
+    - name: Run gh_download_artifact.py to download 'published_urls.json'
+      run: |
+        python gh_download_artifact.py \
+          --owner ${{ github.repository_owner }} \
+          --repo ${{ github.event.repository.name }} \
+          --artifact_name lemmy_published_urls \
+          --token ${{ secrets.GH_PAT }} \
+          --save_dir "./"
+
+    - name: Run bots/bot_gifs.py
+      run: python bots/bot_gifs.py # Replace 'main.py' with the actual filename if different
+      env:
+        LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
+        LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
+
+    - name: Store 'last_date_published.txt' as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: lemmy_last_date_published
+        path: last_date_published.txt
+    
+    - name: Store 'published_urls.json' as an artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: lemmy_published_urls
+        path: published_urls.json
