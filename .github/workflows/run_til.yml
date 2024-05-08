@@ -1,4 +1,4 @@
-name: Run main.py every 10 minutes
+name: Run bot_til.py every 10 minutes
 
 on:
   schedule:
