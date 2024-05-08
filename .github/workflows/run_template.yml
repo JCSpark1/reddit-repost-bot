@@ -2,7 +2,7 @@ name: Run bot_template.py every 10 minutes
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # Run every 19 minutes
+    - cron: '*/10 * * * *' # Run every 10 minutes
   push:
     branches:
       - main
