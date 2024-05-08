@@ -181,7 +181,7 @@ def main():
         else:
             entries_to_publish.append(entry)
         # Limit the number of entries to be published to 3
-        if len(entries_to_publish) >= 3:
+        if len(entries_to_publish) >= 2:
             break
 
     print("\nNumber of entries to be published to lemmy:", len(entries_to_publish))
