@@ -62,16 +62,16 @@ jobs:
         LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
         LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
 
-    - name: Store 'til_last_date_published.txt' as an artifact
+    - name: Store 'last_date_published.txt' as an artifact
       if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
-        name: til_lemmy_last_date_published
-        path: til_last_date_published.txt
+        name: lemmy_last_date_published
+        path: last_date_published.txt
     
-    - name: Store 'til_published_urls.json' as an artifact
+    - name: Store 'published_urls.json' as an artifact
       if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
-        name: til_lemmy_published_urls
-        path: til_published_urls.json
+        name: lemmy_published_urls
+        path: published_urls.json
