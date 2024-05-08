@@ -5,7 +5,7 @@ on:
     - cron: '*/5 * * * *' # Run every 19 minutes
   push:
     branches:
-      - "coolguides"
+      - main
 
 jobs:
   run-main-py:
