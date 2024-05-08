@@ -1,15 +1,15 @@
-name: Run origin/bot_coolguides.py every 10 minutes
+name: Run bot_coolguides.py every 10 minutes
 
 on:
   schedule:
     - cron: '*/5 * * * *' # Run every 19 minutes
   push:
     branches:
-      - "origin/coolguides"
+      - "coolguides"
 
 jobs:
   run-main-py:
-    name: Run origin/bot_coolguides.py
+    name: Run bot_coolguides.py
     runs-on: ubuntu-latest
 
     env:
@@ -55,8 +55,8 @@ jobs:
           --token ${{ secrets.GH_PAT }} \
           --save_dir "./"
 
-    - name: Run origin/bot_coolguides.py
-      run: python origin/bot_coolguides.py # Replace 'main.py' with the actual filename if different
+    - name: Run bot_coolguides.py
+      run: python bot_coolguides.py # Replace 'main.py' with the actual filename if different
       env:
         LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
         LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
