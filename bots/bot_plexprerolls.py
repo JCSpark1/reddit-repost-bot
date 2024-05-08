@@ -137,7 +137,7 @@ def remove_old_entries(entries, limit_hours=24):
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
-    community_name = 'plex'
+    community_name = 'botland'
     subreddit_rss_url = "https://www.reddit.com/r/PlexPrerolls/new/.rss"
     sleep_time = 5
 
@@ -180,6 +180,9 @@ def main():
             print(f"Skip entry already published:  {path}")
         else:
             entries_to_publish.append(entry)
+        # Limit the number of entries to be published to 3
+        if len(entries_to_publish) >= 2:
+            break
 
     print("\nNumber of entries to be published to lemmy:", len(entries_to_publish))
 

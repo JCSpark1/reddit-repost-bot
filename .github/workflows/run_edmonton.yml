@@ -1,8 +1,8 @@
-name: Run bots/bot_edmonton.py every 10-59/10 minutes
+name: Run bots/bot_edmonton.py
 
 on:
   schedule:
-    - cron: '10-59/10 * * * *' # Run every 10 minutes
+    - cron: '30 */4 * * *' # Runs every 4 hours starting at 00:30
   push:
     branches:
       - main
