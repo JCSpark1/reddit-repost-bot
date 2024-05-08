@@ -137,7 +137,7 @@ def remove_old_entries(entries, limit_hours=24):
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
-    community_name = 'pbs_place'
+    community_name = 'nostalgia'
     subreddit_rss_url = "https://www.reddit.com/r/nostalgia/new/.rss"
     sleep_time = 5
 
