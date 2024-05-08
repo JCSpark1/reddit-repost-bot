@@ -2,7 +2,7 @@ name: Run bots/bot_edmonton.py
 
 on:
   schedule:
-    - cron: '30 */4 * * *' # Runs every 4 hours starting at 00:30
+    - cron: '30 */2 * * *' # Runs every 4 hours starting at 00:30
   push:
     branches:
       - main

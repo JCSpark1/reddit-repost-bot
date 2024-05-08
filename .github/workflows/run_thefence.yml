@@ -2,7 +2,7 @@ name: Run bots/bot_thefence.py
 
 on:
   schedule:
-    - cron: '0 3-23/4 * * *' # Runs every 4 hours starting at 03:00
+    - cron: '0 1-23/2 * * *' # Runs every 4 hours starting at 03:00
   push:
     branches:
       - main
