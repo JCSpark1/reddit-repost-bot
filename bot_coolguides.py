@@ -137,8 +137,8 @@ def remove_old_entries(entries, limit_hours=24):
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
-    community_name = 'bapcsalescanada'
-    subreddit_rss_url = "https://www.reddit.com/r/bapcsalescanada/new/.rss"
+    community_name = 'pbs_place'
+    subreddit_rss_url = "https://www.reddit.com/r/coolguides/new/.rss"
     sleep_time = 5
 
     username = os.environ["LEMMY_USERNAME"]
