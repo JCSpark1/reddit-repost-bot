@@ -2,8 +2,8 @@ name: Run bots/bot_edmonton.py
 
 on:
   schedule:
-#    - cron: '0 2,10,18 * * *' # Runs every 4 hours
-    - cron: '*/30 * * * *' # Run every 15 min starting at 00:30
+#    - cron: '0 2,10,18 * * *' # Runs three times per day
+    - cron: '*/30 * * * *' # Run every 30 min for testing
   workflow_dispatch:
 
 jobs:

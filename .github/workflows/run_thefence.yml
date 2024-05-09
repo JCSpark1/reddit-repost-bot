@@ -2,7 +2,7 @@ name: Run bots/bot_thefence.py
 
 on:
   schedule:
-    - cron: '0 7,15,23 * * *' # Runs every 4 hours starting at 03:00
+    - cron: '0 7,15,23 * * *' # Runs three times per day
   workflow_dispatch:
 
 jobs:

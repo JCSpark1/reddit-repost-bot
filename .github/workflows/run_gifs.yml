@@ -2,7 +2,7 @@ name: Run bots/bot_gifs.py
 
 on:
   schedule:
-    - cron: '0 3,11,19 * * *' # Runs every 4 hours starting at 01:00
+    - cron: '0 3,11,19 * * *' # Runs three times per day
   workflow_dispatch:
 
 jobs:

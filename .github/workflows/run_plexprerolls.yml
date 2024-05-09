@@ -2,7 +2,7 @@ name: Run bots/bot_plexprerolls.py
 
 on:
   schedule:
-    - cron: '0 5,13,21 * * *' # Runs every 4 hours starting at 02:00
+    - cron: '0 5,13,21 * * *' # Runs three times per day
   workflow_dispatch:
 
 jobs:

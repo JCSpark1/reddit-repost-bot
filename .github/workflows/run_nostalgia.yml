@@ -2,7 +2,7 @@ name: Run bots/bot_nostalgia.py
 
 on:
   schedule:
-    - cron: '0 4,12,20 * * *' # Runs every 4 hours starting at 01:30
+    - cron: '0 4,12,20 * * *' # Runs three times per day
   workflow_dispatch:
 
 jobs:
