@@ -180,6 +180,11 @@ def main():
             print(f"Skip Reddit post as it looks like a question: {entry.title} ({path})")
             continue  # Skip this entry
 
+        # Check if the title is less than 40 characters
+        if len(entry.title) < 40:
+            print(f"Skip Reddit post due to short title: {entry.title} ({path})")
+            continue  # Skip this entry
+
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
         
