@@ -39,6 +39,15 @@ def format_and_extract(summary):
 
     return formatted, extracted_url
 
+def load_ignored_domains(path="ignored.txt", as_set=True):
+    with open(path) as f:
+        lines = [l.strip() for l in f.readlines()]
+    lines = [l for l in lines if not l.startswith("#") and l != ""]
+    if as_set is True:
+        lines = set(lines)
+
+    return lines
+
 def main():
     instance_url = "https://lemmy.ca"
     community_name = 'til'
