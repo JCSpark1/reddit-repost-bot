@@ -168,7 +168,8 @@ def main():
     entries_to_publish = []
 
     # Define keywords that typically indicate a question
-    question_keywords = ["how", "what", "why", "when", "where", "who", "which", "is", "are", "can", "should", "will", "?"]
+    #question_keywords = ["how", "what", "why", "when", "where", "who", "which", "is", "are", "can", "should", "will", "?"]
+    question_keywords = ["how", "why", "when", "where", "which", "?"]
 
     for entry in feed.entries:
         entry_published = dt.datetime.fromisoformat(entry.published)
@@ -181,9 +182,9 @@ def main():
             continue  # Skip this entry
 
         # Check if the title is less than 40 characters
-        if len(entry.title) < 40:
-            print(f"Skip Reddit post due to short title: {entry.title} ({path})")
-            continue  # Skip this entry
+        #if len(entry.title) < 40:
+        #    print(f"Skip Reddit post due to short title: {entry.title} ({path})")
+        #    continue  # Skip this entry
 
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
