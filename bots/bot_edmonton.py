@@ -166,10 +166,19 @@ def main():
     print(f"Found {len(published_urls_dict)} URLs from reddit that was published to lemmy in the last {limit_hours} hours")
 
     entries_to_publish = []
+
+    # Define keywords that typically indicate a question
+    question_keywords = ["how", "what", "why", "when", "where", "who", "which", "is", "are", "can", "should", "will", "?"]
+
     for entry in feed.entries:
         entry_published = dt.datetime.fromisoformat(entry.published)
         time_diff = dt_now - entry_published
         path = urlparse(entry.link).path
+
+        # Check if the title contains any of the question keywords
+        if any(keyword in entry.title.lower() for keyword in question_keywords):
+            print(f"Skip Reddit post as it looks like a question: {entry.title} ({path})")
+            continue  # Skip this entry
 
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
