@@ -51,6 +51,46 @@ def get_last_published_time(
         last_published = dt_now - offset
     return last_published
 
+def load_published_urls_dict(path="published_urls.json"):
+    try:
+        with open(path, "r") as f:
+            published_urls_dict = json.load(f)
+    except FileNotFoundError:
+        published_urls_dict = {}
+
+    return published_urls_dict
+
+def save_published_urls_dict(published_urls_dict, path="published_urls.json"):
+    with open(path, "w") as f:
+        json.dump(published_urls_dict, f, indent=2)
+
+def remove_old_url_keys(url_dict, limit_hours=24):
+    """
+    Remove entries that are older than `limit_hours` hours
+    """
+
+    new_entries = {}
+
+    dt_now = dt.datetime.now(dt.timezone.utc)
+
+    for url, entry in url_dict.items():
+        entry_published = dt.datetime.fromisoformat(entry["published_time"])
+        time_diff = dt_now - entry_published
+
+        if time_diff < dt.timedelta(hours=limit_hours):
+            new_entries[url] = entry
+
+    return new_entries
+
+def find_base_domain(extracted_url):
+    try:
+        url_parsed = tldextract.extract(extracted_url)
+        base_domain = f"{url_parsed.domain}.{url_parsed.suffix}"
+    except:
+        base_domain = None
+    
+    return base_domain
+
 def load_ignored_domains(path="ignored.txt", as_set=True):
     with open(path) as f:
         lines = [l.strip() for l in f.readlines()]
