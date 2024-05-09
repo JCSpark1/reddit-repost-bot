@@ -3,9 +3,7 @@ name: Run bots/bot_gifs.py
 on:
   schedule:
     - cron: '0 3,11,19 * * *' # Runs every 4 hours starting at 01:00
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   run-main-py:

@@ -3,9 +3,7 @@ name: Run bots/bot_til.py
 on:
   schedule:
     - cron: '0 8,16,0 * * *' # Runs every 4 hours starting at 03:30
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   run-main-py:

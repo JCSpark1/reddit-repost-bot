@@ -4,9 +4,7 @@ on:
   schedule:
 #    - cron: '0 2,10,18 * * *' # Runs every 4 hours
     - cron: '*/30 * * * *' # Run every 15 min starting at 00:30
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   run-main-py:
