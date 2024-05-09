@@ -12,6 +12,7 @@ import time
 import html
 import json
 from urllib.parse import urlparse
+import mimetypes
 
 import tldextract
 from bs4 import BeautifulSoup
@@ -134,10 +135,25 @@ def remove_old_entries(entries, limit_hours=24):
 
     return new_entries
 
+def extract_image_url(summary):
+    soup = BeautifulSoup(summary, features="html.parser")
+    image_tags = soup.find_all("img")
+
+    for img_tag in image_tags:
+        src = img_tag.get("src")
+        if src:
+            # Check if the source URL is an image URL based on the MIME type
+            mime_type, _ = mimetypes.guess_type(src)
+            if mime_type and mime_type.startswith('image'):
+                return src
+
+    return None
+
+
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
-    community_name = 'coolguides'
+    community_name = 'botland'
     subreddit_rss_url = "https://www.reddit.com/r/coolguides/new/.rss"
     sleep_time = 5
 
@@ -192,6 +208,9 @@ def main():
         formatted, extracted_url = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
+        # Extract image URL from the Reddit post
+        image_url = extract_image_url(entry.summary)
+
         if base_domain in ignored_domains:
             print(
                 f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
@@ -199,6 +218,12 @@ def main():
                 
         else:
             print(f"Publishing post: {path}")
+
+            # Prepare body content with image if available
+            if image_url:
+                image_link = lemmy.image_upload(image_url)  # Example: Use Lemmy API to upload image
+                formatted += f"\n\n![Image]({image_link})"  # Markdown image link in body
+
             lemmy.post.create(
                 community_id=community_id,
                 name=html.unescape(entry.title),
@@ -208,7 +233,10 @@ def main():
             time.sleep(sleep_time)
 
             # Now, add this to list of published files
-            published_urls_dict[entry.link] = {"published_time": entry.published}
+            published_urls_dict[entry.link] = {
+                "published_time": entry.published,
+                "image_url": image_url  # Store image URL for reference
+            }
 
 
     save_published_urls_dict(published_urls_dict)
