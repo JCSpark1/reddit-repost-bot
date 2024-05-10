@@ -43,28 +43,41 @@ def format_and_extract(summary):
     soup = BeautifulSoup(summary, features="html.parser")
     
     # Extract title
-    title_tag = soup.title
-    title = html.unescape(title_tag.string) if title_tag else "Untitled Post"
+    title = None
+    title_tag = soup.find("a", {"title": True})
+    if title_tag:
+        title = html.unescape(title_tag["title"])
     
     # Extract author
-    author_tag = soup.find("author")
-    author = author_tag.name.string[3:] if author_tag else "Unknown Author"
+    author = None
+    author_tag = soup.find("a", href=True)
+    if author_tag:
+        author_href = author_tag["href"]
+        if author_href.startswith("/user/"):
+            author = author_href[6:]  # Remove '/user/' to get the author's username
     
     # Extract image URL
-    image_url_tag = soup.find("img")
-    image_url = image_url_tag["src"] if image_url_tag and "src" in image_url_tag.attrs else None
+    image_url = None
+    image_tag = soup.find("img", src=True)
+    if image_tag:
+        image_url = image_tag["src"]
     
     # Extract original post URL and comments URL
-    link_elements = soup.find_all("a")
-    original_post_url = next((link["href"] for link in link_elements if "[link]" in link.text), None)
-    comments_url = next((link["href"] for link in link_elements if "[comments]" in link.text), None)
+    original_post_url = None
+    comments_url = None
+    link_elements = soup.find_all("a", href=True)
+    for link in link_elements:
+        if link.text == "[link]":
+            original_post_url = link["href"]
+        elif link.text == "[comments]":
+            comments_url = link["href"]
     
     # Format Lemmy post body
-    post_body = (
-        f"{html.unescape(title)}\n\n"
-        f"- Submitted by [u/{author}](https://old.reddit.com/user/{author})\n"
-    )
-    
+    post_body = ""
+    if title:
+        post_body += f"{html.unescape(title)}\n\n"
+    if author:
+        post_body += f"- Submitted by [u/{author}](https://old.reddit.com/user/{author})\n"
     if original_post_url:
         post_body += f"- [Original Post]({original_post_url})\n"
     if comments_url:
