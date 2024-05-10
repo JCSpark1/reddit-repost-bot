@@ -39,6 +39,31 @@ def format_and_extract(summary):
 
     return formatted, extracted_url
 
+def format_and_extract(summary):
+    soup = BeautifulSoup(summary, features="html.parser")
+    title = html.unescape(soup.title.string)  # Extract title
+    author = soup.author.name.string[3:]  # Extract author username (remove '/u/')
+    content_table = soup.table
+    
+    # Extract image URL
+    image_url = content_table.find("img")["src"]
+    
+    # Extract original post URL and comments URL
+    link_elements = content_table.find_all("a")
+    original_post_url = link_elements[0]["href"]
+    comments_url = link_elements[1]["href"]
+    
+    # Format Lemmy post body
+    post_body = (
+        f"{html.unescape(title)}\n\n"
+        f"- Submitted by [u/{author}](https://old.reddit.com/user/{author})\n"
+        f"- [Original Post]({original_post_url})\n"
+        f"- [Comments]({comments_url})\n"
+        f"![Image]({image_url})"
+    )
+    
+    return title, post_body
+
 def get_last_published_time(
     path="last_date_published.txt", offset=dt.timedelta(minutes=10, seconds=45)
 ):
@@ -102,7 +127,7 @@ def load_ignored_domains(path="ignored.txt", as_set=True):
 
 def main():
     instance_url = "https://lemmy.ca"
-    community_name = 'til'
+    community_name = 'botland'
     subreddit_rss_url = "https://www.reddit.com/r/todayilearned/new/.rss"
     limit_hours = 24
     sleep_time = 5
@@ -142,17 +167,22 @@ def main():
 
     for entry in entries_to_publish:
         path = urlparse(entry.link).path
-        formatted, extracted_url = format_and_extract(entry.summary)
-        base_domain = find_base_domain(extracted_url)
 
+        # Scrape and extract data from the Reddit RSS entry
+        title, post_body = format_and_extract(entry.summary)
+
+        # Check if the base domain is in the ignored list
+        extracted_url = entry.link
+        base_domain = find_base_domain(extracted_url)
         if base_domain in ignored_domains:
             continue
 
+        # Post to Lemmy community
         lemmy_response = lemmy.post.create(
             community_id=community_id,
-            name=html.unescape(entry.title),
-            url=extracted_url,
-            body=formatted,
+            name=title,
+            url=entry.link,
+            body=post_body,
         )
 
         if lemmy_response and "id" in lemmy_response:
