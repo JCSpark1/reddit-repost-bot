@@ -153,7 +153,7 @@ def extract_image_url(summary):
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
-    community_name = 'botland'
+    community_name = 'coolguides'
     subreddit_rss_url = "https://www.reddit.com/r/coolguides/new/.rss"
     sleep_time = 5
 
