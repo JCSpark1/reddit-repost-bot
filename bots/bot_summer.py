@@ -194,6 +194,10 @@ def main():
         # Scrape and extract data from the Reddit RSS entry
         title, post_body = format_and_extract(entry.summary)
 
+        # Verify extracted data before posting
+        if title is None or post_body is None:
+            continue
+
         # Check if the base domain is in the ignored list
         extracted_url = entry.link
         base_domain = find_base_domain(extracted_url)
@@ -201,15 +205,19 @@ def main():
             continue
 
         # Post to Lemmy community
-        lemmy_response = lemmy.post.create(
-            community_id=community_id,
-            name=title,
-            url=entry.link,
-            body=post_body,
-        )
+        try:
+            lemmy_response = lemmy.post.create(
+                community_id=community_id,
+                name=title,
+                url=entry.link,
+                body=post_body,
+            )
 
-        if lemmy_response and "id" in lemmy_response:
-            published_urls_dict[entry.link] = {"published_time": entry.published}
+            if lemmy_response and "id" in lemmy_response:
+                published_urls_dict[entry.link] = {"published_time": entry.published}
+        except Exception as e:
+            print(f"Error encountered while posting to Lemmy: {str(e)}")
+            continue
 
         time.sleep(sleep_time)
 
