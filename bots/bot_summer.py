@@ -41,26 +41,36 @@ def format_and_extract(summary):
 
 def format_and_extract(summary):
     soup = BeautifulSoup(summary, features="html.parser")
-    title = html.unescape(soup.title.string)  # Extract title
-    author = soup.author.name.string[3:]  # Extract author username (remove '/u/')
-    content_table = soup.table
+    
+    # Extract title
+    title_tag = soup.title
+    title = html.unescape(title_tag.string) if title_tag else "Untitled Post"
+    
+    # Extract author
+    author_tag = soup.find("author")
+    author = author_tag.name.string[3:] if author_tag else "Unknown Author"
     
     # Extract image URL
-    image_url = content_table.find("img")["src"]
+    image_url_tag = soup.find("img")
+    image_url = image_url_tag["src"] if image_url_tag and "src" in image_url_tag.attrs else None
     
     # Extract original post URL and comments URL
-    link_elements = content_table.find_all("a")
-    original_post_url = link_elements[0]["href"]
-    comments_url = link_elements[1]["href"]
+    link_elements = soup.find_all("a")
+    original_post_url = next((link["href"] for link in link_elements if "[link]" in link.text), None)
+    comments_url = next((link["href"] for link in link_elements if "[comments]" in link.text), None)
     
     # Format Lemmy post body
     post_body = (
         f"{html.unescape(title)}\n\n"
         f"- Submitted by [u/{author}](https://old.reddit.com/user/{author})\n"
-        f"- [Original Post]({original_post_url})\n"
-        f"- [Comments]({comments_url})\n"
-        f"![Image]({image_url})"
     )
+    
+    if original_post_url:
+        post_body += f"- [Original Post]({original_post_url})\n"
+    if comments_url:
+        post_body += f"- [Comments]({comments_url})\n"
+    if image_url:
+        post_body += f"![Image]({image_url})\n"
     
     return title, post_body
 
