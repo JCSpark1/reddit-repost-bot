@@ -221,6 +221,11 @@ def main():
         )
     else:
         print(f"Publishing post: {path}")
+
+        # Append markdown_content to the end of the formatted body content
+        if markdown_content:
+            formatted += f"\n\n{markdown_content}"
+
         if image_url:
             # If an image URL is available, use it in the Lemmy post
             lemmy.post.create(
@@ -228,8 +233,7 @@ def main():
                 name=html.unescape(entry.title),
                 url=extracted_url,
                 body=formatted,
-                image_url=image_url,
-                markdown=markdown_content  # Add the Markdown content here
+                image_url=image_url
             )
         else:
             # No specific image URL found, create post without image
@@ -237,8 +241,7 @@ def main():
                 community_id=community_id,
                 name=html.unescape(entry.title),
                 url=extracted_url,
-                body=formatted,
-                markdown=markdown_content  # Add the Markdown content here
+                body=formatted
             )
 
             time.sleep(sleep_time)
