@@ -26,6 +26,7 @@ def format_and_extract(summary):
 
     extracted_url = None
     formatted = ""
+    image_url = None
 
     for link in links:
         first_child = next(link.children).strip()
