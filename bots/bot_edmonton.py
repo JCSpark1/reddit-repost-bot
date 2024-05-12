@@ -208,19 +208,20 @@ def main():
         formatted, extracted_url = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
-        if base_domain in ignored_domains:
-            print(
-                f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
-            )
-                
-        elif
-            print(f"Publishing post: {path}")
+    if base_domain in ignored_domains:
+        print(
+            f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
+        )
+    else:
+        print(f"Publishing post: {path}")
+        if image_url:
+            # If an image URL is available, use it in the Lemmy post
             lemmy.post.create(
                 community_id=community_id,
                 name=html.unescape(entry.title),
                 url=extracted_url,
                 body=formatted,
-                image_url=image_url  # Add the image URL here
+                image_url=image_url
             )
         else:
             # No specific image URL found, create post without image
@@ -228,8 +229,9 @@ def main():
                 community_id=community_id,
                 name=html.unescape(entry.title),
                 url=extracted_url,
-                body=formatted,
+                body=formatted
             )
+
             time.sleep(sleep_time)
 
             # Now, add this to list of published files
