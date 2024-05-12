@@ -213,7 +213,7 @@ def main():
                 f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
             )
                 
-        else:
+        elif:
             print(f"Publishing post: {path}")
             lemmy.post.create(
                 community_id=community_id,
