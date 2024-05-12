@@ -207,7 +207,7 @@ def main():
     for entry in entries_to_publish:
         # Publish the summary to lemmy and sleep for a bit
         path = urlparse(entry.link).path
-        formatted, extracted_url = format_and_extract(entry.summary)
+        formatted, extracted_url, image_url = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
     if base_domain in ignored_domains:
