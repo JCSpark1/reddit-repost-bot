@@ -27,6 +27,8 @@ def format_and_extract(summary):
     extracted_url = None
     formatted = ""
     image_url = None
+    markdown_content = None
+
 
     for link in links:
         first_child = next(link.children).strip()
@@ -52,9 +54,12 @@ def format_and_extract(summary):
                 first_child = first_child[:-1]
             text = html.unescape(first_child)
 
-        formatted += f"- [{text}]({url})\n"
+    # Extract Markdown content from <div class="md">
+    md_div = soup.find("div", class_="md")
+    if md_div:
+        markdown_content = md_div.decode_contents()
 
-    return formatted, extracted_url, image_url
+    return formatted, extracted_url, image_url, markdown_content
 
 
 def get_last_published_time(
@@ -207,7 +212,7 @@ def main():
     for entry in entries_to_publish:
         # Publish the summary to lemmy and sleep for a bit
         path = urlparse(entry.link).path
-        formatted, extracted_url, image_url = format_and_extract(entry.summary)
+        formatted, extracted_url, image_url, markdown_content = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
     if base_domain in ignored_domains:
@@ -224,6 +229,7 @@ def main():
                 url=extracted_url,
                 body=formatted,
                 image_url=image_url
+                markdown=markdown_content  # Add the Markdown content here
             )
         else:
             # No specific image URL found, create post without image
@@ -232,6 +238,7 @@ def main():
                 name=html.unescape(entry.title),
                 url=extracted_url,
                 body=formatted
+                markdown=markdown_content  # Add the Markdown content here
             )
 
             time.sleep(sleep_time)
