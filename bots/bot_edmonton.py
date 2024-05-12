@@ -18,6 +18,18 @@ from bs4 import BeautifulSoup
 import feedparser
 from pythorhead import Lemmy
 
+def fetch_text_content(entry):
+    try:
+        summary = entry.get("summary")  # Extract summary or description from RSS feed entry
+        if summary:
+            soup = BeautifulSoup(summary, "html.parser")
+            text_content = soup.get_text(separator="\n")
+            return text_content
+        else:
+            return "No text content found in RSS feed entry"
+    except Exception as e:
+        return f"Error fetching text content from RSS feed entry: {str(e)}"
+
 
 def format_and_extract(summary):
     soup = BeautifulSoup(summary, features="html.parser")
