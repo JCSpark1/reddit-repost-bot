@@ -33,14 +33,17 @@ def fetch_text_content(entry):
 
 def fetch_external_text_content(url):
     try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, "html.parser")
-            # Extract text content from the linked site (adjust as needed based on site structure)
-            text_content = soup.get_text(separator="\n")
-            return text_content.strip()  # Return text content from the linked site
+        if url.startswith("https://v.redd.it/") or url.startswith("http://v.redd.it/"):
+            return "Reddit Video Link"  # Special message for Reddit video links
         else:
-            return f"Failed to fetch content from URL: {url}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, "html.parser")
+                # Extract text content from the linked site (adjust as needed based on site structure)
+                text_content = soup.get_text(separator="\n")
+                return text_content.strip()  # Return text content from the linked site
+            else:
+                return f"Failed to fetch content from URL: {url}"
     except Exception as e:
         return f"Error fetching content from URL: {url} - {str(e)}"
 
@@ -57,20 +60,17 @@ def format_and_extract(summary):
 
         if first_child == "[link]":
             extracted_url = url
-            text = "Link Shared on Reddit"
+            if url.startswith("https://v.redd.it/") or url.startswith("http://v.redd.it/"):
+                text = "Reddit Video Link"
+            else:
+                text = "Link Shared on Reddit"
             # Fetch text content using custom function
-            if url.startswith("http"):  # Check if the URL is external
+            if not text == "Reddit Video Link":
                 text_content = fetch_external_text_content(url)
                 if text_content:
                     text = text_content
                 else:
                     text = f"Error fetching content from URL: {url}"
-            else:
-                text_content = fetch_text_content(soup)
-                if text_content:
-                    text = text_content
-                else:
-                    text = "Error fetching text content from RSS feed entry"
 
         elif first_child == "[comments]":
             text = "Original Reddit Comments"
