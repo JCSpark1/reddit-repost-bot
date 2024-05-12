@@ -12,6 +12,7 @@ import time
 import html
 import json
 from urllib.parse import urlparse
+import mimetypes
 
 import tldextract
 from bs4 import BeautifulSoup
