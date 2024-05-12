@@ -33,20 +33,12 @@ def format_and_extract(summary):
         if first_child == "[link]":
             extracted_url = url
             text = "Link Shared on Reddit"
-            # Scrape text content from the Reddit post URL
-            try:
-                response = requests.get(url)
-                if response.status_code == 200:
-                    post_soup = BeautifulSoup(response.content, "html.parser")
-                    post_content = post_soup.find("div", class_="md")
-                    if post_content:
-                        text = post_content.get_text(separator="\n")
-                    else:
-                        text = "No text content found"
-                else:
-                    text = "Failed to fetch text content"
-            except Exception as e:
-                text = "Error fetching text content"
+            # Fetch text content using custom function
+            text_content = fetch_text_content(soup)
+            if text_content:
+                text = text_content
+            else:
+                text = "Error fetching text content from RSS feed entry"
 
         elif first_child == "[comments]":
             text = "Original Reddit Comments"
