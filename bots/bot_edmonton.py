@@ -12,40 +12,12 @@ import time
 import html
 import json
 from urllib.parse import urlparse
-import requests
 
 import tldextract
 from bs4 import BeautifulSoup
 import feedparser
 from pythorhead import Lemmy
 
-def fetch_text_content(entry):
-    try:
-        summary = entry.get("summary")  # Extract summary or description from RSS feed entry
-        if summary:
-            soup = BeautifulSoup(summary, "html.parser")
-            text_content = soup.get_text(separator="\n")
-            return text_content
-        else:
-            return "No text content found in RSS feed entry"
-    except Exception as e:
-        return f"Error fetching text content from RSS feed entry: {str(e)}"
-
-def fetch_external_text_content(url):
-    try:
-        if url.startswith("https://v.redd.it/") or url.startswith("http://v.redd.it/"):
-            return "Reddit Video Link"  # Special message for Reddit video links
-        else:
-            response = requests.get(url)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, "html.parser")
-                # Extract text content from the linked site (adjust as needed based on site structure)
-                text_content = soup.get_text(separator="\n")
-                return text_content.strip()  # Return text content from the linked site
-            else:
-                return f"Failed to fetch content from URL: {url}"
-    except Exception as e:
-        return f"Error fetching content from URL: {url} - {str(e)}"
 
 def format_and_extract(summary):
     soup = BeautifulSoup(summary, features="html.parser")
@@ -58,20 +30,15 @@ def format_and_extract(summary):
         first_child = next(link.children).strip()
         url = link.get("href")
 
+        # Check if the URL points to an image
+        mime, _ = mimetypes.guess_type(url)
+        if mime and mime.startswith('image'):
+            image_url = url
+            continue  # Skip adding image link to the formatted text
+
         if first_child == "[link]":
             extracted_url = url
-            if url.startswith("https://v.redd.it/") or url.startswith("http://v.redd.it/"):
-                text = "Reddit Video Link"
-            else:
-                text = "Link Shared on Reddit"
-            # Fetch text content using custom function
-            if not text == "Reddit Video Link":
-                text_content = fetch_external_text_content(url)
-                if text_content:
-                    text = text_content
-                else:
-                    text = f"Error fetching content from URL: {url}"
-
+            text = "Link Shared on Reddit"
         elif first_child == "[comments]":
             text = "Original Reddit Comments"
         elif first_child.startswith("/u/"):
@@ -220,11 +187,6 @@ def main():
             print(f"Skip Reddit post as it looks like a question: {entry.title} ({path})")
             continue  # Skip this entry
 
-        # Check if the title is less than 40 characters
-        #if len(entry.title) < 40:
-        #    print(f"Skip Reddit post due to short title: {entry.title} ({path})")
-        #    continue  # Skip this entry
-
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
         
@@ -253,6 +215,15 @@ def main():
                 
         else:
             print(f"Publishing post: {path}")
+            lemmy.post.create(
+                community_id=community_id,
+                name=html.unescape(entry.title),
+                url=extracted_url,
+                body=formatted,
+                image_url=image_url  # Add the image URL here
+            )
+        else:
+            # No specific image URL found, create post without image
             lemmy.post.create(
                 community_id=community_id,
                 name=html.unescape(entry.title),
