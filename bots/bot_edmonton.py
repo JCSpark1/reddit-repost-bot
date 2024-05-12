@@ -54,7 +54,7 @@ def format_and_extract(summary):
 
         formatted += f"- [{text}]({url})\n"
 
-    return formatted, extracted_url
+    return formatted, extracted_url, image_url
 
 
 def get_last_published_time(
