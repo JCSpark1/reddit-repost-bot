@@ -12,7 +12,6 @@ import time
 import html
 import json
 from urllib.parse import urlparse
-import mimetypes
 
 import tldextract
 from bs4 import BeautifulSoup
@@ -26,19 +25,10 @@ def format_and_extract(summary):
 
     extracted_url = None
     formatted = ""
-    image_url = None
-    markdown_content = None
-
 
     for link in links:
         first_child = next(link.children).strip()
         url = link.get("href")
-
-        # Check if the URL points to an image
-        mime, _ = mimetypes.guess_type(url)
-        if mime and mime.startswith('image'):
-            image_url = url
-            continue  # Skip adding image link to the formatted text
 
         if first_child == "[link]":
             extracted_url = url
@@ -54,12 +44,9 @@ def format_and_extract(summary):
                 first_child = first_child[:-1]
             text = html.unescape(first_child)
 
-    # Extract Markdown content from <div class="md">
-    md_div = soup.find("div", class_="md")
-    if md_div:
-        markdown_content = md_div.decode_contents()
+        formatted += f"- [{text}]({url})\n"
 
-    return formatted, extracted_url, image_url, markdown_content
+    return formatted, extracted_url
 
 
 def get_last_published_time(
@@ -194,6 +181,11 @@ def main():
             print(f"Skip Reddit post as it looks like a question: {entry.title} ({path})")
             continue  # Skip this entry
 
+        # Check if the title is less than 40 characters
+        #if len(entry.title) < 40:
+        #    print(f"Skip Reddit post due to short title: {entry.title} ({path})")
+        #    continue  # Skip this entry
+
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
         
@@ -212,38 +204,22 @@ def main():
     for entry in entries_to_publish:
         # Publish the summary to lemmy and sleep for a bit
         path = urlparse(entry.link).path
-        formatted, extracted_url, image_url, markdown_content = format_and_extract(entry.summary)
+        formatted, extracted_url = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
-    if base_domain in ignored_domains:
-        print(
-            f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
-        )
-    else:
-        print(f"Publishing post: {path}")
-
-        # Append markdown_content to the end of the formatted body content
-        if markdown_content:
-            formatted += f"\n\n{markdown_content}"
-
-        if image_url:
-            # If an image URL is available, use it in the Lemmy post
+        if base_domain in ignored_domains:
+            print(
+                f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
+            )
+                
+        else:
+            print(f"Publishing post: {path}")
             lemmy.post.create(
                 community_id=community_id,
                 name=html.unescape(entry.title),
                 url=extracted_url,
                 body=formatted,
-                image_url=image_url
             )
-        else:
-            # No specific image URL found, create post without image
-            lemmy.post.create(
-                community_id=community_id,
-                name=html.unescape(entry.title),
-                url=extracted_url,
-                body=formatted
-            )
-
             time.sleep(sleep_time)
 
             # Now, add this to list of published files
