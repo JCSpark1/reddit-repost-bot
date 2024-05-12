@@ -228,7 +228,7 @@ def main():
                 name=html.unescape(entry.title),
                 url=extracted_url,
                 body=formatted,
-                image_url=image_url
+                image_url=image_url,
                 markdown=markdown_content  # Add the Markdown content here
             )
         else:
@@ -237,7 +237,7 @@ def main():
                 community_id=community_id,
                 name=html.unescape(entry.title),
                 url=extracted_url,
-                body=formatted
+                body=formatted,
                 markdown=markdown_content  # Add the Markdown content here
             )
 
