@@ -20,30 +20,13 @@ def authenticate():
         print(f"Authentication failed: {response.status_code}")
         return None
 
-def get_community_id(community_name, auth_token):
-    url = f"{LEMMY_API_BASE_URL}/c/{community_name}"
-    headers = {
-        "Authorization": f"Bearer {auth_token}"
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        try:
-            return response.json()["id"]
-        except json.decoder.JSONDecodeError:
-            print(f"Failed to parse JSON response: {response.text}")
-            return None
-    else:
-        print(f"Failed to get community ID: {response.status_code}, {response.text}")
-        return None
-
-
-def get_recent_posts(auth_token, community_id):
+def get_recent_posts(auth_token, community_name):
     url = f"{LEMMY_API_BASE_URL}/post/list"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
     params = {
-        "community_id": community_id,
+        "community_id": community_name,
         "sort": "New",
         "limit": 10
     }
@@ -105,16 +88,14 @@ def delete_post(post_id, auth_token):
 def monitor_community():
     auth_token = authenticate()
     if auth_token:
-        community_id = get_community_id(community_name, auth_token)
-        if community_id:
-            posts = get_recent_posts(auth_token, community_id)
-            for post in posts:
-                count = check_for_delete_mentions(post, auth_token)
-                if count >= 3:
-                    delete_post(post["id"], auth_token)
-                elif count > 0:
-                    remaining = 3 - count
-                    post_confirmation_reply(post["id"], remaining, auth_token)
+        posts = get_recent_posts(auth_token)
+        for post in posts:
+            count = check_for_delete_mentions(post, auth_token)
+            if count >= 3:
+                delete_post(post["id"], auth_token)
+            elif count > 0:
+                remaining = 3 - count
+                post_confirmation_reply(post["id"], remaining, auth_token)
 
 if __name__ == "__main__":
     monitor_community()
