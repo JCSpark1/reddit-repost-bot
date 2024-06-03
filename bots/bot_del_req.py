@@ -41,7 +41,6 @@ def get_recent_posts(auth_token, community_name):
         return []
 
 def check_for_delete_mentions(post, auth_token):
-    post_id = post["id"]  # Reverting to use 'id' key
     url = f"{LEMMY_API_BASE_URL}/post?id={post_id}"
     headers = {"Authorization": f"Bearer {auth_token}"}
     response = requests.get(url, headers=headers)
