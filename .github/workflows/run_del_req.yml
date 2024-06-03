@@ -23,7 +23,7 @@ jobs:
 
       - name: Run Lemmy bot
         env:
-          LEM_MY_USERNAME: ${{ secrets.LEM_MY_USERNAME }}
-          LEM_MY_PASSWORD: ${{ secrets.LEM_MY_PASSWORD }}
+          LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
+          LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
         run: python bots/bot_del_req.py
 
