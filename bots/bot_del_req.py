@@ -21,7 +21,7 @@ def authenticate():
         return None
 
 def get_community_id(community_name, auth_token):
-    url = f"{LEMMY_API_BASE_URL}/community/by_name?name={community_name}"
+    url = f"{LEMMY_API_BASE_URL}/c/{community_name}"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
