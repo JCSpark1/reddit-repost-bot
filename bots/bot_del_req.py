@@ -60,7 +60,7 @@ def check_for_delete_mentions(post, auth_token):
             comment_response = requests.get(comment_url, headers=headers)
             if comment_response.status_code == 200:
                 comment = comment_response.json()
-                if comment["content"] == f"{USERNAME_TO_WATCH} deleteThis!":
+                if comment["comment"]["content"] == f"{USERNAME_TO_WATCH} deleteThis!":
                     count += 1
         return count
     
