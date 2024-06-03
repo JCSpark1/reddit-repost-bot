@@ -92,6 +92,7 @@ def delete_post(post_id, auth_token):
         "Authorization": f"Bearer {auth_token}"
     }
     data = {
+        "deleted": True,
         "post_id": post_id
     }
     response = requests.post(url, headers=headers, json=data)
