@@ -42,13 +42,16 @@ def get_recent_posts(auth_token, community_name):
 
 def check_for_delete_mentions(post, auth_token):
     post_id = post["post"]["id"]
-    url = f"{LEMMY_API_BASE_URL}/post?id={post_id}"
+    community_name = post["community"]["name"]
+    
+    url = f"{LEMMY_API_BASE_URL}/comment/list?GetComments=post_id={post_id}&community_name={community_name}"
     headers = {"Authorization": f"Bearer {auth_token}"}
+    
     response = requests.get(url, headers=headers)
+    
     if response.status_code == 200:
-        post_data = response.json()
-        replies = post_data["replies"]
-        count = sum(1 for reply in replies if reply["content"] == f"{USERNAME_TO_WATCH} deleteThis!")
+        comments = response.json()
+        count = sum(1 for comment in comments if comment["content"] == f"{USERNAME_TO_WATCH} deleteThis!")
         return count
     return 0
 
