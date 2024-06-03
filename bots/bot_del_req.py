@@ -98,6 +98,5 @@ def monitor_community():
                 post_confirmation_reply(post["id"], remaining, auth_token)
 
 if __name__ == "__main__":
-    community_id = lemmy.discover_community(community_name)
     monitor_community()
 
