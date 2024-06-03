@@ -51,13 +51,15 @@ def check_for_delete_mentions(post, auth_token):
     
     if response.status_code == 200:
         comments = response.json()
+        print(comments)  # Print comments object for inspection
         
-        # Extract comment IDs
-        comment_ids = [comment["id"] for comment in comments]
+        # Remove this line: comment_ids = [comment["id"] for comment in comments]
         
         # Check each comment for delete requests
         count = 0
-        for comment_id in comment_ids:
+        for comment in comments:
+            # Update this line to use the comment ID from the current comment object
+            comment_id = comment["id"]
             comment_url = f"{LEMMY_API_BASE_URL}/comment?id={comment_id}"
             comment_response = requests.get(comment_url, headers=headers)
             if comment_response.status_code == 200:
@@ -67,6 +69,7 @@ def check_for_delete_mentions(post, auth_token):
         return count
     
     return 0
+
 
 def post_confirmation_reply(post_id, remaining, auth_token):
     url = f"{LEMMY_API_BASE_URL}/comment/create"
