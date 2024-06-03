@@ -45,7 +45,7 @@ def check_for_delete_mentions(post, auth_token):
     post_id = post["post"]["id"]
     community_name = post["community"]["name"]
     
-    url = f"{LEMMY_API_BASE_URL}/comment/list?GetComments=post_id={post_id}&community_name={community_name}"
+    url = f"{LEMMY_API_BASE_URL}/comment/list?post_id={post_id}&community_name={community_name}"
     headers = {"Authorization": f"Bearer {auth_token}"}
     
     response = requests.get(url, headers=headers)
