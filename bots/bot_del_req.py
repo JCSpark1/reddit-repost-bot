@@ -28,7 +28,8 @@ def get_recent_posts(auth_token, community_name):
     params = {
         "community_name": community_name,
         "sort": "New",
-        "limit": 10
+        "limit": 10,
+        "deleted": "false"
     }
     response = requests.get(url, headers=headers, params=params)
     if response.status_code == 200:
