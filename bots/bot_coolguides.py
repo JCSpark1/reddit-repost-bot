@@ -12,7 +12,6 @@ import time
 import html
 import json
 from urllib.parse import urlparse
-import mimetypes
 
 import tldextract
 from bs4 import BeautifulSoup
@@ -96,7 +95,7 @@ def find_base_domain(extracted_url):
         base_domain = f"{url_parsed.domain}.{url_parsed.suffix}"
     except:
         base_domain = -1
-    
+
     return base_domain
 
 def remove_old_url_keys(url_dict, limit_hours=24):
@@ -135,26 +134,11 @@ def remove_old_entries(entries, limit_hours=24):
 
     return new_entries
 
-def extract_image_url(summary):
-    soup = BeautifulSoup(summary, features="html.parser")
-    image_tags = soup.find_all("img")
-
-    for img_tag in image_tags:
-        src = img_tag.get("src")
-        if src:
-            # Check if the source URL is an image URL based on the MIME type
-            mime_type, _ = mimetypes.guess_type(src)
-            if mime_type and mime_type.startswith('image'):
-                return src
-
-    return None
-
-
 def main():
     limit_hours = 24
     instance_url = "https://lemmy.ca"
     community_name = 'coolguides'
-    subreddit_rss_url = "https://www.reddit.com/r/coolguides/new/.rss"
+    subreddit_rss_url = "https://www.reddit.com/r/coolguides/hot/.rss"
     sleep_time = 5
 
     username = os.environ["LEMMY_USERNAME"]
@@ -176,20 +160,35 @@ def main():
     dt_now = dt.datetime.now(dt.timezone.utc)
     write_last_published_time(dt_now)
     print("Written last published time as:", dt_now)
-    
+
     published_urls_dict = load_published_urls_dict()
     published_urls_dict = remove_old_url_keys(published_urls_dict, limit_hours=limit_hours)
     print(f"Found {len(published_urls_dict)} URLs from reddit that was published to lemmy in the last {limit_hours} hours")
 
     entries_to_publish = []
+
+    # Define keywords that typically indicate a question
+    #question_keywords = ["how", "what", "why", "when", "where", "who", "which", "is", "are", "can", "should", "will", "?"]
+    question_keywords = ["how", "why", "when", "where", "which", "?"]
+
     for entry in feed.entries:
         entry_published = dt.datetime.fromisoformat(entry.published)
         time_diff = dt_now - entry_published
         path = urlparse(entry.link).path
 
+        # Check if the title contains any of the question keywords
+        if any(keyword in entry.title.lower() for keyword in question_keywords):
+            print(f"Skip Reddit post as it looks like a question: {entry.title} ({path})")
+            continue  # Skip this entry
+
+        # Check if the title is less than 40 characters
+        #if len(entry.title) < 40:
+        #    print(f"Skip Reddit post due to short title: {entry.title} ({path})")
+        #    continue  # Skip this entry
+
         if "General Discussion - Daily Thread" in entry.title:
             print(f"Skip Reddit Discussion Thread: {path}")
-        
+
         elif time_diff > dt.timedelta(hours=limit_hours):
             print(f"Skip entry published >{limit_hours}h ago: {path}")
         elif entry.link in published_urls_dict:
@@ -197,7 +196,7 @@ def main():
         else:
             entries_to_publish.append(entry)
         # Limit the number of entries to be published to 3
-        if len(entries_to_publish) >= 2:
+        if len(entries_to_publish) >= 1:
             break
 
     print("\nNumber of entries to be published to lemmy:", len(entries_to_publish))
@@ -208,22 +207,13 @@ def main():
         formatted, extracted_url = format_and_extract(entry.summary)
         base_domain = find_base_domain(extracted_url)
 
-        # Extract image URL from the Reddit post
-        image_url = extract_image_url(entry.summary)
-
         if base_domain in ignored_domains:
             print(
                 f"Ignore post with link matched to '{base_domain}' in ignore list: {path}"
             )
-                
+
         else:
             print(f"Publishing post: {path}")
-
-            # Prepare body content with image if available
-            if image_url:
-                image_link = lemmy.image_upload(image_url)  # Example: Use Lemmy API to upload image
-                formatted += f"\n\n![Image]({image_link})"  # Markdown image link in body
-
             lemmy.post.create(
                 community_id=community_id,
                 name=html.unescape(entry.title),
@@ -233,10 +223,7 @@ def main():
             time.sleep(sleep_time)
 
             # Now, add this to list of published files
-            published_urls_dict[entry.link] = {
-                "published_time": entry.published,
-                "image_url": image_url  # Store image URL for reference
-            }
+            published_urls_dict[entry.link] = {"published_time": entry.published}
 
 
     save_published_urls_dict(published_urls_dict)
