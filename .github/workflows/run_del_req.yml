@@ -1,4 +1,4 @@
-name: Run Lemmy Delete Request Bot
+name: Run Lemmy Bot
 
 on:
   schedule:
@@ -21,9 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run LemDelReq bot
+      - name: Run Lemmy bot
         env:
-          LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
-          LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
-        run: bots/bot_del_req.py
+          LEM_MY_USERNAME: ${{ secrets.LEM_MY_USERNAME }}
+          LEM_MY_PASSWORD: ${{ secrets.LEM_MY_PASSWORD }}
+        run: python bots/bot_del_req.py
 
