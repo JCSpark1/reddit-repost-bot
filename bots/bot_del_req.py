@@ -27,10 +27,15 @@ def get_community_id(community_name, auth_token):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        return response.json()["id"]
+        try:
+            return response.json()["id"]
+        except json.decoder.JSONDecodeError:
+            print(f"Failed to parse JSON response: {response.text}")
+            return None
     else:
-        print(f"Failed to get community ID: {response.status_code}, {response.json()}")
+        print(f"Failed to get community ID: {response.status_code}, {response.text}")
         return None
+
 
 def get_recent_posts(auth_token, community_id):
     url = f"{LEMMY_API_BASE_URL}/post/list"
