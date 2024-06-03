@@ -2,7 +2,7 @@ import requests
 import os
 
 LEMMY_API_BASE_URL = "https://lemmy.ca/api/v3"
-COMMUNITY_ID = "botland"  # Update this to the community ID
+community_name = "botland"  # Update this to the community ID
 USERNAME_TO_WATCH = "@partybot"
 LEMMY_USERNAME = os.getenv("LEMMY_USERNAME")
 LEMMY_PASSWORD = os.getenv("LEMMY_PASSWORD")
@@ -26,7 +26,7 @@ def get_recent_posts(auth_token):
         "Authorization": f"Bearer {auth_token}"
     }
     params = {
-        "community_id": COMMUNITY_ID,
+        "community_id": lemmy.discover_community(community_name),
         "sort": "New",
         "limit": 10
     }
