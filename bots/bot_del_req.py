@@ -41,6 +41,7 @@ def get_recent_posts(auth_token, community_name):
         return []
 
 def check_for_delete_mentions(post, auth_token):
+    print(post)  # Add this line to check the structure of the post object
     url = f"{LEMMY_API_BASE_URL}/post/{post['id']}"
     headers = {
         "Authorization": f"Bearer {auth_token}"
