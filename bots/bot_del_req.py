@@ -60,13 +60,13 @@ def check_for_delete_mentions(post, auth_token):
             comment_content = comment["content"]
             if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
                 count += 1
-        return count
+        return count, post_id  # Return post_id along with the count
     
-    return 0
+    return 0, None  # Return None if post_id not found
 
 
 def post_confirmation_reply(post_id, remaining, auth_token):
-    if "id" in post_id:
+    if post_id:
         url = f"{LEMMY_API_BASE_URL}/comment/create"
         headers = {
             "Authorization": f"Bearer {auth_token}"
@@ -102,7 +102,7 @@ def monitor_community():
     if auth_token:
         posts = get_recent_posts(auth_token, community_name)
         for post in posts:
-            count = check_for_delete_mentions(post, auth_token)
+            count, post_id = check_for_delete_mentions(post, auth_token)  # Get post_id from check_for_delete_mentions
             if count >= 3:
                 delete_post(post_id, auth_token)
             elif count > 0:
