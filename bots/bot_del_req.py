@@ -94,7 +94,7 @@ def monitor_community():
             if count >= 5:
                 delete_post(post["id"], auth_token)
             elif count > 0:
-                remaining = 5 - count
+                remaining = 3 - count
                 post_confirmation_reply(post["id"], remaining, auth_token)
 
 if __name__ == "__main__":
