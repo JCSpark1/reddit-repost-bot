@@ -41,19 +41,14 @@ def get_recent_posts(auth_token, community_name):
         return []
 
 def check_for_delete_mentions(post, auth_token):
-    print(post)  # Add this line to check the structure of the post object
-    url = f"{LEMMY_API_BASE_URL}/post/{post['id']}"
-    headers = {
-        "Authorization": f"Bearer {auth_token}"
-    }
+    post_id = post["post_id"]  # Update to use 'post_id' key
+    url = f"{LEMMY_API_BASE_URL}/post/{post_id}"
+    headers = {"Authorization": f"Bearer {auth_token}"}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         post_data = response.json()
         replies = post_data["replies"]
-        count = 0
-        for reply in replies:
-            if reply["content"] == f"{USERNAME_TO_WATCH} deleteThis!":
-                count += 1
+        count = sum(1 for reply in replies if reply["content"] == f"{USERNAME_TO_WATCH} deleteThis!")
         return count
     return 0
 
