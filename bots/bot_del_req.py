@@ -88,7 +88,7 @@ def delete_post(post_id, auth_token):
 def monitor_community():
     auth_token = authenticate()
     if auth_token:
-        posts = get_recent_posts(auth_token)
+        posts = get_recent_posts(auth_token, community_name)
         for post in posts:
             count = check_for_delete_mentions(post, auth_token)
             if count >= 3:
