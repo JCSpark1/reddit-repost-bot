@@ -76,9 +76,9 @@ def post_confirmation_reply(post_id, remaining, auth_token):
             "post_id": post_id,
             "content": f"Request to delete received. {remaining} more required to remove the post."
         }
-        print(f"Attempting to post confirmation on post {post_id}")
-        print("Data sent for comment creation:", data)
+        print("Data sent for comment creation:", data)  # Print out the request data
         response = requests.post(url, headers=headers, json=data)
+        print("Response content:", response.content)  # Print out the response content
         if response.status_code == 200:
             print(f"Posted confirmation on post {post_id}")
         else:
