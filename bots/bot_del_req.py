@@ -21,7 +21,7 @@ def authenticate():
         return None
 
 def get_recent_posts(auth_token):
-    url = f"{LEMMY_API_BASE_URL}/post/list"
+    url = f"{LEM_MY_API_BASE_URL}/post/list"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
@@ -34,7 +34,10 @@ def get_recent_posts(auth_token):
     if response.status_code == 200:
         return response.json()["posts"]
     else:
-        print(f"Failed to fetch posts: {response.status_code}")
+        print(f"Failed to fetch posts: {response.status_code}, {response.json()}")
+        print(f"Request URL: {url}")
+        print(f"Request Headers: {headers}")
+        print(f"Request Params: {params}")
         return []
 
 def check_for_delete_mentions(post, auth_token):
