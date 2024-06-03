@@ -63,16 +63,17 @@ def check_for_delete_mentions(post, auth_token):
             comment = comment_data["comment"]  # Access the nested comment data
             comment_id = comment["id"]
             comment_content = comment["content"]
+            creator_id = comment["creator"]["id"]  # Access the ID of the comment creator
             if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
                 # Check if user has already requested to delete within the last hour
-                if comment["creator"] not in delete_requests or datetime.now() - delete_requests[comment["creator"]] > timedelta(hours=1):
-                    delete_requests[comment["creator"]] = datetime.now()
+                if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
+                    delete_requests[creator_id] = datetime.now()
                     count += 1
                     # Pass parent_id to post_confirmation_reply function
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"], already_requested=True, parent_id=comment_id)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"]["name"], already_requested=True, parent_id=comment_id)
                 else:
                     # If user has already requested, reply with a message indicating so
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"], already_requested=True)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"]["name"], already_requested=True)
         return count, post_id  # Return post_id along with the count
     
     return 0, None  # Return None if post_id not found
