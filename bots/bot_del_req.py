@@ -104,10 +104,10 @@ def monitor_community():
         for post in posts:
             count = check_for_delete_mentions(post, auth_token)
             if count >= 3:
-                delete_post(post["id"], auth_token)
+                delete_post(post_id, auth_token)
             elif count > 0:
                 remaining = 3 - count
-                post_confirmation_reply(post["id"], remaining, auth_token)
+                post_confirmation_reply(post_id, remaining, auth_token)
 
 if __name__ == "__main__":
     monitor_community()
