@@ -66,19 +66,22 @@ def check_for_delete_mentions(post, auth_token):
 
 
 def post_confirmation_reply(post_id, remaining, auth_token):
-    url = f"{LEMMY_API_BASE_URL}/comment/create"
-    headers = {
-        "Authorization": f"Bearer {auth_token}"
-    }
-    data = {
-        "post_id": post_id,
-        "content": f"Request to delete received. {remaining} more required to remove the post."
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-        print(f"Posted confirmation on post {post_id}")
+    if "id" in post_id:
+        url = f"{LEMMY_API_BASE_URL}/comment/create"
+        headers = {
+            "Authorization": f"Bearer {auth_token}"
+        }
+        data = {
+            "post_id": post_id,
+            "content": f"Request to delete received. {remaining} more required to remove the post."
+        }
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code == 200:
+            print(f"Posted confirmation on post {post_id}")
+        else:
+            print(f"Failed to post confirmation on post {post_id}: {response.status_code}")
     else:
-        print(f"Failed to post confirmation on post {post_id}: {response.status_code}")
+        print("Post ID not found. Unable to post confirmation.")
 
 def delete_post(post_id, auth_token):
     url = f"{LEMMY_API_BASE_URL}/post/delete"
