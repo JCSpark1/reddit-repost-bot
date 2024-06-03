@@ -21,7 +21,7 @@ def authenticate():
         return None
 
 def get_recent_posts(auth_token):
-    url = f"{LEM_MY_API_BASE_URL}/post/list"
+    url = f"{LEMMY_API_BASE_URL}/post/list"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
