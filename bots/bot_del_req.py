@@ -20,13 +20,25 @@ def authenticate():
         print(f"Authentication failed: {response.status_code}")
         return None
 
+def get_community_id(community_name, auth_token):
+    url = f"{LEM_MY_API_BASE_URL}/community/by_name?name={community_name}"
+    headers = {
+        "Authorization": f"Bearer {auth_token}"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()["id"]
+    else:
+        print(f"Failed to get community ID: {response.status_code}, {response.json()}")
+        return None
+
 def get_recent_posts(auth_token):
     url = f"{LEMMY_API_BASE_URL}/post/list"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
     params = {
-        "community_id": lemmy.discover_community(community_name),
+        "community_id": community_id,
         "sort": "New",
         "limit": 10
     }
@@ -88,14 +100,16 @@ def delete_post(post_id, auth_token):
 def monitor_community():
     auth_token = authenticate()
     if auth_token:
-        posts = get_recent_posts(auth_token)
-        for post in posts:
-            count = check_for_delete_mentions(post, auth_token)
-            if count >= 5:
-                delete_post(post["id"], auth_token)
-            elif count > 0:
-                remaining = 3 - count
-                post_confirmation_reply(post["id"], remaining, auth_token)
+        community_id = get_community_id(COMMUNITY_NAME, auth_token)
+        if community_id:
+            posts = get_recent_posts(auth_token, community_id)
+            for post in posts:
+                count = check_for_delete_mentions(post, auth_token)
+                if count >= 3:
+                    delete_post(post["id"], auth_token)
+                elif count > 0:
+                    remaining = 3 - count
+                    post_confirmation_reply(post["id"], remaining, auth_token)
 
 if __name__ == "__main__":
     monitor_community()
