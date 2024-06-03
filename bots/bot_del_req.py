@@ -50,18 +50,16 @@ def check_for_delete_mentions(post, auth_token):
     response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
-        comments_data = response.json()["comments"]  # Access the 'comments' key
+        comments_data = response.json()["comments"]
         
         # Check each comment for delete requests
         count = 0
         for comment_data in comments_data:
-            comment_id = comment_data["comment"]["id"]  # Access the nested comment ID
-            comment_url = f"{LEMMY_API_BASE_URL}/comment?id={comment_id}"
-            comment_response = requests.get(comment_url, headers=headers)
-            if comment_response.status_code == 200:
-                comment = comment_response.json()
-                if comment["comment"]["content"] == f"{USERNAME_TO_WATCH} deleteThis!":
-                    count += 1
+            comment = comment_data["comment"]  # Access the nested comment data
+            comment_id = comment["id"]
+            comment_content = comment["content"]
+            if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
+                count += 1
         return count
     
     return 0
