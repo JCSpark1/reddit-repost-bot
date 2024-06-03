@@ -1,0 +1,29 @@
+name: Run Lemmy Delete Request Bot
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # Runs every 10 minutes
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run LemDelReq bot
+        env:
+          LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
+          LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
+        run: bot_del_req.py
+
