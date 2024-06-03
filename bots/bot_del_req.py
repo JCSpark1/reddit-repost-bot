@@ -2,7 +2,7 @@ import requests
 import os
 
 LEMMY_API_BASE_URL = "https://lemmy.ca/api/v3"
-community_name = "botland"  # Update this to the community ID
+community_name = "botland"  # Update this to the community name
 USERNAME_TO_WATCH = "@partybot"
 LEMMY_USERNAME = os.getenv("LEMMY_USERNAME")
 LEMMY_PASSWORD = os.getenv("LEMMY_PASSWORD")
@@ -21,7 +21,7 @@ def authenticate():
         return None
 
 def get_community_id(community_name, auth_token):
-    url = f"{LEM_MY_API_BASE_URL}/community/by_name?name={community_name}"
+    url = f"{LEMMY_API_BASE_URL}/community/by_name?name={community_name}"
     headers = {
         "Authorization": f"Bearer {auth_token}"
     }
@@ -32,7 +32,7 @@ def get_community_id(community_name, auth_token):
         print(f"Failed to get community ID: {response.status_code}, {response.json()}")
         return None
 
-def get_recent_posts(auth_token):
+def get_recent_posts(auth_token, community_id):
     url = f"{LEMMY_API_BASE_URL}/post/list"
     headers = {
         "Authorization": f"Bearer {auth_token}"
@@ -100,7 +100,7 @@ def delete_post(post_id, auth_token):
 def monitor_community():
     auth_token = authenticate()
     if auth_token:
-        community_id = get_community_id(COMMUNITY_NAME, auth_token)
+        community_id = get_community_id(community_name, auth_token)
         if community_id:
             posts = get_recent_posts(auth_token, community_id)
             for post in posts:
