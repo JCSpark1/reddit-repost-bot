@@ -25,5 +25,5 @@ jobs:
         env:
           LEMMY_USERNAME: ${{ secrets.LEMMY_USERNAME }}
           LEMMY_PASSWORD: ${{ secrets.LEMMY_PASSWORD }}
-        run: bot_del_req.py
+        run: bots/bot_del_req.py
 
