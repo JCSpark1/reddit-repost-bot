@@ -26,7 +26,7 @@ def get_recent_posts(auth_token, community_name):
         "Authorization": f"Bearer {auth_token}"
     }
     params = {
-        "community_id": community_name,
+        "community_name": community_name,
         "sort": "New",
         "limit": 10
     }
@@ -98,5 +98,6 @@ def monitor_community():
                 post_confirmation_reply(post["id"], remaining, auth_token)
 
 if __name__ == "__main__":
+    community_id = lemmy.discover_community(community_name)
     monitor_community()
 
