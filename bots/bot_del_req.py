@@ -51,8 +51,21 @@ def check_for_delete_mentions(post, auth_token):
     
     if response.status_code == 200:
         comments = response.json()
-        count = sum(1 for comment in comments if comment["content"] == f"{USERNAME_TO_WATCH} deleteThis!")
+        
+        # Extract comment IDs
+        comment_ids = [comment["id"] for comment in comments]
+        
+        # Check each comment for delete requests
+        count = 0
+        for comment_id in comment_ids:
+            comment_url = f"{LEMMY_API_BASE_URL}/comment?id={comment_id}"
+            comment_response = requests.get(comment_url, headers=headers)
+            if comment_response.status_code == 200:
+                comment_data = comment_response.json()
+                if comment_data["content"] == f"{USERNAME_TO_WATCH} deleteThis!":
+                    count += 1
         return count
+    
     return 0
 
 def post_confirmation_reply(post_id, remaining, auth_token):
