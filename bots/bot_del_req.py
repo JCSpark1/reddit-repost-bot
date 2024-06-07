@@ -58,46 +58,43 @@ def check_for_delete_mentions(post, auth_token):
         comments_data = response.json()["comments"]
         
         # Check each comment for delete requests
-        delete_requests_dict = {}
+        count = 0
         for comment_data in comments_data:
             comment = comment_data["comment"]  # Access the nested comment data
             comment_id = comment["id"]
             comment_content = comment["content"]
             creator_id = comment["creator_id"]  # Access the ID of the comment creator
             
-            # Fetch user information based on creator_id
-            user_info = get_user_info(auth_token, creator_id)
-            if user_info:
-                creator_name = user_info.get("username", f"User {creator_id}")  # Use username if available, otherwise use user id
-                delete_requests_dict[creator_name] = comment_id
-            
             if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
                 # Check if user has already requested to delete within the last hour
                 if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
                     delete_requests[creator_id] = datetime.now()
-                    delete_requests_dict[creator_name] = comment_id
-        
-        return delete_requests_dict, post_id  # Return dictionary of delete requests along with the post_id
+                    count += 1
+                    user_info = get_user_info(auth_token, creator_id)
+                    if user_info:
+                        post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user_id=creator_id, user_name=user_info.get("name"), already_requested=True)
+                else:
+                    # If user has already requested, reply with a message indicating so
+                    user_info = get_user_info(auth_token, creator_id)
+                    if user_info:
+                        post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user_id=creator_id, user_name=user_info.get("name"), already_requested=True)
+        return count, post_id  # Return post_id along with the count
     
-    return {}, None  # Return empty dictionary if post_id not found
+    return 0, None  # Return None if post_id not found
 
-
-def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
+def post_confirmation_reply(post_id, remaining, auth_token, user_id, user_name, already_requested=False):
     if post_id:
         url = f"{LEMMY_API_BASE_URL}/comment"
-        headers = {
-            "Authorization": f"Bearer {auth_token}"
-        }
+        headers = {"Authorization": f"Bearer {auth_token}"}
         
         if already_requested:
-            content = f"User {creator_id} has already requested to delete this post. Others need to reply as well to remove the post."
+            content = f"User {user_name} has already requested to delete this post. Others need to reply as well to remove the post."
         else:
             content = f"Request to delete received. {remaining} more required to remove the post."
         
         data = {
             "post_id": post_id,
-            "content": content,
-            "parent_id": parent_id  # Set the parent_id if available
+            "content": content
         }
         
         print("Data sent for comment creation:", data)  # Print out the request data
@@ -110,8 +107,6 @@ def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_
             print(f"Failed to post confirmation on post {post_id}: {response.status_code}")
     else:
         print("Post ID not found. Unable to post confirmation.")
-
-
 
 def delete_post(post_id, auth_token):
     url = f"{LEMMY_API_BASE_URL}/post/delete"
