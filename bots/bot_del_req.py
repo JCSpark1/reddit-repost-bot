@@ -81,7 +81,7 @@ def check_for_delete_mentions(post, auth_token):
 
 def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
     if post_id:
-        url = f"{LEMMY_API_BASE_URL}/post"
+        url = f"{LEMMY_API_BASE_URL}/comment"
         headers = {
             "Authorization": f"Bearer {auth_token}"
         }
