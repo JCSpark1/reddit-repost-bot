@@ -132,8 +132,9 @@ def monitor_community():
             elif count > 0:
                 remaining = 3 - count
                 for creator_id, comment_id in delete_requests_dict.items():  # Loop through the dictionary to get creator_id and comment_id
-                    post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=comment_id)
-
+                    # Ensure that parent_id is a string or None
+                    parent_id = str(comment_id) if comment_id else None
+                    post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=parent_id)
 
 if __name__ == "__main__":
     monitor_community()
