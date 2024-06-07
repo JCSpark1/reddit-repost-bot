@@ -140,18 +140,18 @@ def monitor_community():
     if auth_token:
         posts = get_recent_posts(auth_token, community_name)
         for post in posts:
-            delete_requests_dict, post_id = check_for_delete_mentions(post, auth_token)  # Get dictionary of delete requests and post_id
-            count = len(delete_requests_dict)  # Extract the count from the dictionary
-            if count >= 3:
-                delete_post(post_id, auth_token)
-            elif count > 0:
-                remaining = 3 - count
-                for creator_id, comment_id in delete_requests_dict.items():  # Loop through the dictionary to get creator_id and comment_id
-                    # Ensure that parent_id is a string or None
-                    parent_id = str(comment_id) if comment_id else None
-                    post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=parent_id)
+            count, post_id = check_for_delete_mentions(post, auth_token)  # Get post_id from check_for_delete_mentions
+            if isinstance(count, int):  # Check if count is an integer (i.e., not an error message)
+                if count >= 3:
+                    delete_post(post_id, auth_token)
+                elif count > 0:
+                    remaining = 3 - count
+                    post_confirmation_reply(post_id, remaining, auth_token)
+            else:
+                print("Error occurred while processing delete requests:", count)
 
 if __name__ == "__main__":
     monitor_community()
+
 
 
