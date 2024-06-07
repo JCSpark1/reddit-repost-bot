@@ -73,13 +73,14 @@ def check_for_delete_mentions(post, auth_token):
                     delete_requests[creator_id] = datetime.now()
                     count += 1
                     # Pass parent_id to post_confirmation_reply function
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, already_requested=True, parent_id=comment_id)
                 else:
                     # If user has already requested, reply with a message indicating so
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, already_requested=True)
         return count, post_id  # Return post_id along with the count
     
     return 0, None  # Return None if post_id not found or if the post is deleted
+
 
 def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
     if post_id:
