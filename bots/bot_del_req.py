@@ -138,8 +138,10 @@ def monitor_community():
                 delete_post(post_id, auth_token)
             elif count > 0:
                 remaining = 3 - count
-                post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=comment_id)
+                for creator_id, comment_id in count:  # Loop through the dictionary to get creator_id and comment_id
+                    post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=comment_id)
 
 if __name__ == "__main__":
     monitor_community()
+
 
