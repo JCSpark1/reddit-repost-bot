@@ -49,9 +49,6 @@ def check_for_delete_mentions(post, auth_token):
     post_id = post["post"]["id"]
     community_name = post["community"]["name"]
     
-    if post["post"]["deleted"]:
-        return 0, None  # Skip processing if the post is deleted
-    
     url = f"{LEMMY_API_BASE_URL}/comment/list?post_id={post_id}&community_name={community_name}"
     headers = {"Authorization": f"Bearer {auth_token}"}
     
@@ -72,14 +69,15 @@ def check_for_delete_mentions(post, auth_token):
                 if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
                     delete_requests[creator_id] = datetime.now()
                     count += 1
-                    # Pass parent_id to post_confirmation_reply function
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, already_requested=True, parent_id=comment_id)
+                    # Pass parent_id and creator_id to post_confirmation_reply function
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
                 else:
                     # If user has already requested, reply with a message indicating so
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, already_requested=True)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True)
         return count, post_id  # Return post_id along with the count
     
-    return 0, None  # Return None if post_id not found or if the post is deleted
+    return 0, None  # Return None if post_id not found
+
 
 
 def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
