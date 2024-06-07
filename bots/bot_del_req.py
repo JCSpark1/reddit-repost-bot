@@ -63,7 +63,7 @@ def check_for_delete_mentions(post, auth_token):
             comment = comment_data["comment"]  # Access the nested comment data
             comment_id = comment["id"]
             comment_content = comment["content"]
-            creator_id = comment["creator"]["id"]  # Access the ID of the comment creator
+            creator_id = comment["creator"]  # Access the ID of the comment creator
             if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
                 # Check if user has already requested to delete within the last hour
                 if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
