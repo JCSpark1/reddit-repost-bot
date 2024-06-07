@@ -58,21 +58,29 @@ def check_for_delete_mentions(post, auth_token):
         comments_data = response.json()["comments"]
         
         # Check each comment for delete requests
-        delete_requests = {}
+        delete_requests_dict = {}
         for comment_data in comments_data:
             comment = comment_data["comment"]  # Access the nested comment data
             comment_id = comment["id"]
             comment_content = comment["content"]
             creator_id = comment["creator_id"]  # Access the ID of the comment creator
+            
+            # Fetch user information based on creator_id
+            user_info = get_user_info(auth_token, creator_id)
+            if user_info:
+                creator_name = user_info.get("username", f"User {creator_id}")  # Use username if available, otherwise use user id
+                delete_requests_dict[creator_name] = comment_id
+            
             if comment_content == f"{USERNAME_TO_WATCH} deleteThis!":
                 # Check if user has already requested to delete within the last hour
                 if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
                     delete_requests[creator_id] = datetime.now()
-                    # Pass parent_id and creator_id to post_confirmation_reply function
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
-        return delete_requests, post_id  # Return dictionary containing creator_id and comment_id pairs along with the post_id
+                    delete_requests_dict[creator_name] = comment_id
+        
+        return delete_requests_dict, post_id  # Return dictionary of delete requests along with the post_id
     
     return {}, None  # Return empty dictionary if post_id not found
+
 
 def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
     if post_id:
@@ -119,6 +127,18 @@ def delete_post(post_id, auth_token):
         print(f"Deleted post {post_id}")
     else:
         print(f"Failed to delete post {post_id}: {response.status_code}")
+
+def get_user_info(auth_token, user_id):
+    url = f"{LEMMY_API_BASE_URL}/user/byId/{user_id}"
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json().get("user")
+    else:
+        print(f"Failed to fetch user info for user ID {user_id}: {response.status_code}")
+        return None
 
 def monitor_community():
     auth_token = authenticate()
