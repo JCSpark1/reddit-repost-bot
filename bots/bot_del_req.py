@@ -58,7 +58,7 @@ def check_for_delete_mentions(post, auth_token):
         comments_data = response.json()["comments"]
         
         # Check each comment for delete requests
-        count = 0
+        delete_requests = {}
         for comment_data in comments_data:
             comment = comment_data["comment"]  # Access the nested comment data
             comment_id = comment["id"]
@@ -68,19 +68,11 @@ def check_for_delete_mentions(post, auth_token):
                 # Check if user has already requested to delete within the last hour
                 if creator_id not in delete_requests or datetime.now() - delete_requests[creator_id] > timedelta(hours=1):
                     delete_requests[creator_id] = datetime.now()
-                    count += 1
                     # Pass parent_id and creator_id to post_confirmation_reply function
                     post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
-                else:
-                    # If user has already requested, reply with a message indicating so
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
-        return count, post_id  # Return post_id along with the count
+        return delete_requests, post_id  # Return dictionary containing creator_id and comment_id pairs along with the post_id
     
-    return 0, None  # Return None if post_id not found
-
-
-
-
+    return {}, None  # Return empty dictionary if post_id not found
 
 def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
     if post_id:
