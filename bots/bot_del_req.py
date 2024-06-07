@@ -70,15 +70,16 @@ def check_for_delete_mentions(post, auth_token):
                     delete_requests[creator_id] = datetime.now()
                     count += 1
                     # Pass parent_id to post_confirmation_reply function
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"]["name"], already_requested=True, parent_id=comment_id)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True, parent_id=comment_id)
                 else:
                     # If user has already requested, reply with a message indicating so
-                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, user=comment["creator"]["name"], already_requested=True)
+                    post_confirmation_reply(post_id, remaining=0, auth_token=auth_token, creator_id=creator_id, already_requested=True)
         return count, post_id  # Return post_id along with the count
     
     return 0, None  # Return None if post_id not found
 
-def post_confirmation_reply(post_id, remaining, auth_token, user, already_requested=False, parent_id=None):
+
+def post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=False, parent_id=None):
     if post_id:
         url = f"{LEMMY_API_BASE_URL}/post"
         headers = {
@@ -86,7 +87,7 @@ def post_confirmation_reply(post_id, remaining, auth_token, user, already_reques
         }
         
         if already_requested:
-            content = f"@{user} You've already requested to delete this post. Others need to reply as well to remove the post."
+            content = f"User {creator_id} has already requested to delete this post. Others need to reply as well to remove the post."
         else:
             content = f"Request to delete received. {remaining} more required to remove the post."
         
@@ -106,6 +107,7 @@ def post_confirmation_reply(post_id, remaining, auth_token, user, already_reques
             print(f"Failed to post confirmation on post {post_id}: {response.status_code}")
     else:
         print("Post ID not found. Unable to post confirmation.")
+
 
 
 def delete_post(post_id, auth_token):
