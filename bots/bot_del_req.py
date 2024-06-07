@@ -125,13 +125,15 @@ def monitor_community():
     if auth_token:
         posts = get_recent_posts(auth_token, community_name)
         for post in posts:
-            count, post_id = check_for_delete_mentions(post, auth_token)  # Get post_id from check_for_delete_mentions
+            delete_requests_dict, post_id = check_for_delete_mentions(post, auth_token)  # Get dictionary of delete requests and post_id
+            count = len(delete_requests_dict)  # Extract the count from the dictionary
             if count >= 3:
                 delete_post(post_id, auth_token)
             elif count > 0:
                 remaining = 3 - count
-                for creator_id, comment_id in count:  # Loop through the dictionary to get creator_id and comment_id
+                for creator_id, comment_id in delete_requests_dict.items():  # Loop through the dictionary to get creator_id and comment_id
                     post_confirmation_reply(post_id, remaining, auth_token, creator_id, already_requested=True, parent_id=comment_id)
+
 
 if __name__ == "__main__":
     monitor_community()
